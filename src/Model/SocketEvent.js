@@ -4,7 +4,7 @@ const DISCONNECTED = 'DISCONNECTED';
 const NEVER = "NEVER";
 const INVALID = "INVALID";
 
-class EventSockets {
+class SocketEvent {
 
     eventId = null;
     matches = {};
@@ -48,7 +48,8 @@ class EventSockets {
         // CONNCETED
         const ONE_CONNECTED = socketOne === CONNECTED;
         const TWO_CONNCETED = socketTwo === CONNECTED;
-     
+
+   
         // DISCONNECTED
         const ONE_DISCONNECTED = socketOne == DISCONNECTED;
         const TWO_DISCONNECTED = socketTwo == DISCONNECTED;
@@ -149,6 +150,14 @@ class EventSockets {
         return this.diconnected;
     };
     
+    broadcast(TYPE, message) {
+        var i = 0;
+        Object.values(this.connected).forEach(socket => {
+            console.log(`socket.emit(${TYPE}, ${message}`)
+            i++
+        });
+        return { result: `Sent ${i} messages of ${TYPE}`}
+    };
 
     addConnection(userId, socketId) {
         if (socketId) {
@@ -159,62 +168,4 @@ class EventSockets {
     };
 };
 
-
-class SocketManager {
-
-    constructor() {}
-
-    // stores connections via eventid
-    events = {};
-    /**
-     * @Inerface
-     * setMatches
-     * getDisconnected
-     * onConnection
-    */
-
-    /**
-     * Set matches in event
-     * @param {*} eventId 
-     * @param {*} matches 
-     */
-    setMatches(eventId, matches) {
-    
-        const event = this.events[eventId];
-        if (!event) {
-            return null
-        }
-        const updated = event.setMatches(matches);
-        return updated  
-    };
-
-    /**
-     * get diconnected
-     * @param {*} eventId 
-     */
-    getDisconnected(eventId) {
-        const event = this.events[eventId];
-        if (!event) {
-            return null;
-        };
-        const diconnected = event.getDisconnected();
-        return diconnected;
-    };
-
-    /**
-     * On user connected
-     * @param {*} socket 
-     */
-    onConnection(socket) {
-        const { query, socketId} = socket;
-        const { userId, eventId} = query;
-
-        if (!this.events[eventId])  {
-            this.events[eventId] = new EventSockets(eventId);
-        };
-        this.events[eventId].addConnection(userId, socketId);
-    };
-};
-
-module.exports = SocketManager;
-
+module.exports = SocketEvent;
