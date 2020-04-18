@@ -1,16 +1,20 @@
 class SocketFactory {
 
-    _createSocket(socketId, query) {
+    _newSocket(socketId, active) {
         return {
              socketId: socketId,
-             query: query
+             connected : active,
+             emit: (type, data) => {
+                console.log(`Emit: ${type} data: ${data} socket: ${socketId}`);
+            }
         };
     };
      
-    _createQuery(userId, eventId) {
+    _create(eventId, userId, socketId, connected) {
         return {
-            userId: userId,
-            eventId: eventId
+            eventId, 
+            userId, 
+            socket: this._newSocket(socketId, connected)
         };
     };
     
@@ -18,15 +22,15 @@ class SocketFactory {
     {
         const eventId = 'event_' + 0;
         var sockets = [];  
-        for (var i = 0; i< amount; i++) {
-
+        for (var i = 0; i< amount; i++) 
+        {
             const userId = 'user_' + i;
-            const socketId = i < disconnected ? null : 'socket_' + i;
-
-            const query = this._createQuery(userId, eventId);
-            const socket = this._createSocket(socketId, query);
+            const socketId = 'socket_' + i;
+            const connected = i < disconnected ? false: true 
+            const socket = this._create(eventId,userId, socketId, connected) ;
             sockets.push(socket)
         };
+
         return sockets;
     };
 };

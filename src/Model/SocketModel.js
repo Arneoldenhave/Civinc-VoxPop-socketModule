@@ -46,10 +46,10 @@ class SocketModel {
      */
     onConnection(connection) {
         const { eventId, userId, socket} = connection;
-
         if (!this.events[eventId])  {
             this.events[eventId] = new SocketEvent(eventId);
         };
+
         this.events[eventId].addConnection(userId, socket);
     };
 
@@ -67,7 +67,7 @@ class SocketModel {
         if (!event) {
              return null;
         };
-        return event.broadcast(type, data);
+        return event.broadcastToAll(type, data);
     };
 
     getEventById(eventId) {

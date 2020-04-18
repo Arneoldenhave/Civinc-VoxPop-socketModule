@@ -23,9 +23,15 @@ class SocketController {
     };
 
     broadcast(eventId, type, data) {
-       return this.model.broadcast(eventId, type, data);
+       return this.model.broadcastToAll(eventId, type, data);
     };
     
+    message(data) {
+        const { eventId, chatId, userId, matchId, message} = data;
+        const result = this.model.broadcastToSpecific(eventId, [matchId], MESSAGE, message);
+        console.log(result);
+        return result
+    };
 
     connect(io) {
         io.on('connection', async(socket) => {
@@ -36,7 +42,6 @@ class SocketController {
 
             const connection = {userId: userId, eventId: eventId, socket: socket };
             this.model.onConnection(connection);
-
             socket.emit(MESSAGE, "connected")
 
             socket.on(MESSAGE, data => {

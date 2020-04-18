@@ -44,12 +44,11 @@ class SocketEvent {
         const socketOne = this.connected[one];
         const socketTwo = this.connected[two];
 
-
+        
         // CONNCETED
-        const ONE_CONNECTED = socketOne === CONNECTED;
-        const TWO_CONNCETED = socketTwo === CONNECTED;
+        const ONE_CONNECTED = socketOne ? socketOne.connected : false;
+        const TWO_CONNCETED = socketTwo ? socketTwo.connected : false;
 
-   
         // DISCONNECTED
         const ONE_DISCONNECTED = socketOne == DISCONNECTED;
         const TWO_DISCONNECTED = socketTwo == DISCONNECTED;
@@ -109,14 +108,12 @@ class SocketEvent {
     };
 
     _handleNeverConnected(ids) {
-        console.log(NEVER);
         ids.forEach(userId => {
             this.never_connected[userId] = NEVER;
         });
     };
 
     _handleDisconnected(ids) {
-        console.log(DISCONNECTED);
         ids.forEach(userId => {
             delete this.connected[userId];
             this.diconnected[userId] = DISCONNECTED;
@@ -124,19 +121,38 @@ class SocketEvent {
     };
 
     _handleInvalid(ids) {
-        console.log(INVALID);
         ids.forEach(userId => {
             this.invalidMatches[userId] = INVALID;
         });
     };
 
+    _handleConnection(userId, socket)
+    {
+        if (socket.connected === false) {
+            delete this.connected[userId];
+            this.disconnected[userId] = socket;
+        } 
+    };
+
     setMatches(matches) {
-        
         for (const match of matches) 
         {
             this._match(match);
         };
         return this;
+    };
+
+    getConnected() {
+        this.checkConnections()
+        const array = Object.keys(this.connected).map( userId => userId);
+        return array;
+    };
+
+    checkConnections() {
+        Object.keys(this.connected).forEach(userId => {
+            const socket = this.connected[userId];
+            this._handleConnection(userId, socket)
+        });
     };
 
     getDisconnected() 
@@ -158,7 +174,7 @@ class SocketEvent {
         var invalid = 0;
 
         ids.forEach(userId => {
-            const socket = this.connected[user];
+            const socket = this.connected[userId];
 
             if (socket && socket.connected) {
                 success++;
@@ -184,25 +200,28 @@ class SocketEvent {
             disconnected,
             invalid
         };
-        
-        console.log(`SocketEvent: ${socketId}\n broadcast: ${TYPE} ${success} times\nFaied: ${failed} times\ndisconnected: ${this.diconnected}\ninvalid: ${invalid} `);
         return result;
     };
 
     broadcastToAll(TYPE, data) {
         var i = 0;
         Object.values(this.connected).forEach(socket => {
-            console.log(`socket.emit(${TYPE}, ${data}`)
+            socket.emit(TYPE, data)
             i++
         });
         return { result: `Sent ${i} messages of ${TYPE}`}
     };
 
-    addConnection(userId, socketId) {
-        if (socketId) {
-            this.connected[userId] = CONNECTED;
-        } else {
-            this.diconnected[userId] = DISCONNECTED;
+    addConnection(userId, socket) {
+        if (socket.connected) 
+        {
+            delete this.diconnected[userId];
+            this.connected[userId] = socket;
+        } 
+        else 
+        {
+            delete this.connected[userId];
+            this.diconnected[userId] = socket;
         };
     };
 };
