@@ -126,7 +126,7 @@ class SocketEvent {
     _handleInvalid(ids) {
         console.log(INVALID);
         ids.forEach(userId => {
-            this.invalidMatches[userId] = INVALID
+            this.invalidMatches[userId] = INVALID;
         });
     };
 
@@ -150,7 +150,46 @@ class SocketEvent {
         return this.diconnected;
     };
     
-    broadcast(TYPE, data) {
+    broadCastToSelected(ids, TYPE, data) 
+    {
+        var success = 0;
+        var failed = 0;
+        var disconnected = 0;
+        var invalid = 0;
+
+        ids.forEach(userId => {
+            const socket = this.connected[user];
+
+            if (socket && socket.connected) {
+                success++;
+                socket.emit(TYPE, data);
+            } 
+            else if (!socket) 
+            {
+                failed++;
+                invalid++;
+                this._handleInvalid([userId]);
+            }
+            else  if(!socket.connected) 
+            {
+                failed++;
+                disconnected++;
+                this._handleDisconnected([userId]);
+            };
+        });
+
+        const result = {
+            success,
+            failed,
+            disconnected,
+            invalid
+        };
+        
+        console.log(`SocketEvent: ${socketId}\n broadcast: ${TYPE} ${success} times\nFaied: ${failed} times\ndisconnected: ${this.diconnected}\ninvalid: ${invalid} `);
+        return result;
+    };
+
+    broadcastToAll(TYPE, data) {
         var i = 0;
         Object.values(this.connected).forEach(socket => {
             console.log(`socket.emit(${TYPE}, ${data}`)

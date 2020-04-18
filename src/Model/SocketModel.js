@@ -44,35 +44,42 @@ class SocketModel {
      * On user connected
      * @param {*} socket 
      */
-    onConnection(socket) {
-        const { query, socketId} = socket;
-        const { userId, eventId} = query;
+    onConnection(connection) {
+        const { eventId, userId, socket} = connection;
 
         if (!this.events[eventId])  {
             this.events[eventId] = new SocketEvent(eventId);
         };
-        this.events[eventId].addConnection(userId, socketId);
+        this.events[eventId].addConnection(userId, socket);
     };
 
-    broadcast(eventId, type, data) {
+    broadcastToSpecific(eventId, ids, type, data) {
+        const event = this.events[eventId];
+        if (!event) {
+            return null;
+        }
+        const result = event.broadCastToSelected(ids, type, data);
+        return result
+    }
+
+    broadcastToAll(eventId, type, data) {
         const event = this.events[eventId];
         if (!event) {
              return null;
         };
         return event.broadcast(type, data);
-        
     };
 
     getEventById(eventId) {
         return this.events[eventId];
-    }
+    };
 
     /**
      * Get al events
     */
     getEvents() {
         return this.events;
-    }
+    };
 };
 
 module.exports = SocketModel;
