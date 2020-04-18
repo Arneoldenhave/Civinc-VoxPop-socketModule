@@ -22,9 +22,6 @@ class SocketFactory {
     
     createSockets(amount, disconnected) 
     {
-
-
-
         const eventId = 'event_' + 0;
         var sockets = [];  
         for (var i = 0; i< amount; i++) {
@@ -51,14 +48,12 @@ router.post('/', (req, res, next) => {
  
     sockets.forEach(socket => {
         socketManager.onConnection(socket)
-
     })
+
     const events = socketManager.events;
-    
-    
-    res.status(200).send(events);
-   
+    res.status(200).send(events);   
 });
+
 
 router.get('/disonnected/:eventId', (req, res, next) => {
     const { eventId } =  req.params;
@@ -67,10 +62,19 @@ router.get('/disonnected/:eventId', (req, res, next) => {
     if (!disconnected) {
         res.status(404).send(`Error: ${eventId} not found!` );
     };
-
-    
-
     res.status(200).send(disconnected);
+});
+
+
+router.post('/matches/:eventId', (req, res, next) => {
+    const { matches } = req.body;
+    const { eventId } = req.params;
+
+    const updated = socketManager.setMatches(eventId, matches);
+    if(!updated) {
+        res.status(404).send(`Error: ${eventId} not found`);
+    }
+    res.status(200).send(updated);
 });
 
 module.exports = router;

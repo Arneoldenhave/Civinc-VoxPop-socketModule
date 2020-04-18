@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
 
-router.use('/socket', require('./sockets'));
+router.use('/sockets', require('./sockets'));
 
 module.exports = router;
