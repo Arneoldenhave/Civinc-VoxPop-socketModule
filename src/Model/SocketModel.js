@@ -54,12 +54,12 @@ class SocketModel {
         this.events[eventId].addConnection(userId, socketId);
     };
 
-    broadcast(eventId, type, message) {
+    broadcast(eventId, type, data) {
         const event = this.events[eventId];
         if (!event) {
              return null;
         };
-        return event.broadcast(type, message);
+        return event.broadcast(type, data);
         
     };
 

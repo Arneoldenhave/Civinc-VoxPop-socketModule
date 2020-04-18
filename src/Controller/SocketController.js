@@ -20,8 +20,8 @@ class SocketController  {
         return this.model.getEvents();
     };
 
-    broadcast(eventId, type, message) {
-       return this.model.broadcast(eventId, type, message)
+    broadcast(eventId, type, data) {
+       return this.model.broadcast(eventId, type, data);
     };
 
 };

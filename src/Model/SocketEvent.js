@@ -150,10 +150,10 @@ class SocketEvent {
         return this.diconnected;
     };
     
-    broadcast(TYPE, message) {
+    broadcast(TYPE, data) {
         var i = 0;
         Object.values(this.connected).forEach(socket => {
-            console.log(`socket.emit(${TYPE}, ${message}`)
+            console.log(`socket.emit(${TYPE}, ${data}`)
             i++
         });
         return { result: `Sent ${i} messages of ${TYPE}`}
